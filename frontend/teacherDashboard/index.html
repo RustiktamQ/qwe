@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FastTest — Мои тесты</title>
+    <meta
+      name="description"
+      content="Панель преподавателя FastTest: список тестов, создание, редактирование, удаление и быстрый шеринговый доступ."
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='6' y='6' width='52' height='52' rx='12' fill='%231a73e8'/%3E%3Cpath d='M18 33h28M18 24h20M18 42h24' stroke='%23fff' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E"
+    />
+    <style>
+      :root {
+        --bg: #ffffff;
+        --surface: #ffffff;
+        --ink: #0b1220;
+        --muted: #5f6b7a;
+        --blue: #1a73e8;
+        --green: #16a34a;
+        --line: #e6e8ee;
+        --shadow: 0 8px 30px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.05);
+        --radius-lg: 16px;
+        --radius: 12px;
+        --radius-sm: 10px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        font: 16px/1.55 Inter, ui-sans-serif, system-ui, -apple-system,
+          'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+        color: var(--ink);
+        background: var(--bg);
+      }
+      a {
+        color: var(--blue);
+        text-decoration: none;
+      }
+      .header {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: var(--surface);
+        border-bottom: 1px solid var(--line);
+      }
+      .header__inner {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 20px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 800;
+      }
+      .logo {
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--blue), #5aa1ff);
+        display: grid;
+        place-items: center;
+        color: #fff;
+        font-weight: 900;
+      }
+      .nav {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 40px;
+        padding: 0 14px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        background: #fff;
+        cursor: pointer;
+        font-weight: 700;
+      }
+      .btn:hover {
+        box-shadow: var(--shadow);
+      }
+      .btn.primary {
+        background: var(--blue);
+        border-color: transparent;
+        color: #fff;
+      }
+      .btn.danger {
+        background: #d93025;
+        color: #fff;
+        border-color: transparent;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .titlebar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin: 10px 0 16px;
+      }
+      .title {
+        font-size: 26px;
+        margin: 0;
+      }
+      .list {
+        display: grid;
+        gap: 12px;
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        padding: 14px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+        align-items: center;
+      }
+      .meta {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .name {
+        font-weight: 800;
+        font-size: 18px;
+      }
+      .muted {
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .icon-btn {
+        height: 36px;
+        padding: 0 12px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        background: #fff;
+        cursor: pointer;
+        font-weight: 700;
+      }
+      .icon-btn.primary {
+        background: var(--blue);
+        color: #fff;
+        border-color: transparent;
+      }
+      .icon-btn:hover {
+        box-shadow: var(--shadow);
+      }
+      .menu-wrap {
+        position: relative;
+      }
+      .kebab {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        background: #fff;
+        cursor: pointer;
+      }
+      .kebab:after {
+        content: '\22EE';
+        display: grid;
+        place-items: center;
+        font-size: 18px;
+        line-height: 1;
+        color: var(--ink);
+      }
+      .menu {
+        position: absolute;
+        right: 0;
+        top: 46px;
+        min-width: 220px;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        display: none;
+        overflow: hidden;
+      }
+      .menu.open {
+        display: block;
+      }
+      .menu a,
+      .menu button {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        width: 100%;
+        padding: 10px 12px;
+        border: 0;
+        background: #fff;
+        color: var(--ink);
+        cursor: pointer;
+        text-align: left;
+      }
+      .menu a:hover,
+      .menu button:hover {
+        background: #f7faff;
+      }
+      .modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.35);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        z-index: 60;
+      }
+      .modal.open {
+        display: flex;
+      }
+      .modal__card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        padding: 18px;
+        max-width: 460px;
+        width: 100%;
+      }
+      .modal__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .close {
+        border: 1px solid var(--line);
+        background: #fff;
+        border-radius: 10px;
+        height: 36px;
+        padding: 0 10px;
+        cursor: pointer;
+      }
+      .toast {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #111827;
+        color: #fff;
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-size: 14px;
+        box-shadow: var(--shadow);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+      }
+      .toast.show {
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="header__inner">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">F</div>
+          <div>FastTest</div>
+        </div>
+        <nav class="nav" aria-label="Навигация">
+          <a class="btn" id="api-link" href="#">API</a>
+          <button class="btn primary" id="btn-new">+ Создать тест</button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container" role="main">
+      <div class="titlebar">
+        <h1 class="title">Мои тесты</h1>
+        <div class="muted" id="count"></div>
+      </div>
+      <section class="list" id="list"></section>
+    </main>
+
+    <div class="modal" id="modal">
+      <div
+        class="modal__card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+      >
+        <div class="modal__header">
+          <strong id="modal-title">Поделиться тестом</strong>
+          <button class="close" id="modal-close">Закрыть</button>
+        </div>
+        <div class="muted" style="margin-bottom: 8px">Ссылка для студентов</div>
+        <div
+          style="
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 12px;
+          "
+        >
+          <input
+            id="share-url"
+            class="input"
+            style="
+              flex: 1;
+              padding: 10px 12px;
+              border: 1px solid var(--line);
+              border-radius: 10px;
+            "
+            readonly
+          />
+          <button class="btn" id="copy-link">Копировать</button>
+        </div>
+        <div class="muted" style="margin-bottom: 8px">QR-код</div>
+        <div
+          id="qrcode"
+          style="
+            display: grid;
+            place-items: center;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 12px;
+          "
+        ></div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast">Скопировано</div>
+
+    <script type="module">
+      import ApiController from '../scripts/apiController.js';
+      import showToast from '../scripts/showToast.js';
+      import decodeJwt from '../scripts/decodeJwt.js';
+      import config from '../config.js';
+
+      const apiLink = document.getElementById('api-link');
+      apiLink.href = `${config.FULL_HOST}/api/docs`;
+
+      const api = new ApiController();
+      const token = localStorage.getItem('token');
+      if (!token) location.assign('../');
+      const auth = await api.isAuthed(token);
+      if (auth?.error) location.assign('../');
+
+      const teacher = decodeJwt(token);
+      const list = document.getElementById('list');
+      const countEl = document.getElementById('count');
+      const btnNew = document.getElementById('btn-new');
+
+      let tests = [];
+
+      function normalizeTest(t) {
+        return {
+          name: String(t.name ?? ''),
+          test_id: t.test_id,
+          teacher_id: t.teacher_id ?? teacher.id,
+          teacher: t.teacher ?? null,
+          questions: Array.isArray(t.questions) ? t.questions : [],
+        };
+      }
+
+      async function loadTests() {
+        const res = await api.getTestsByTeacher(teacher.id);
+        if (res?.error) {
+          list.innerHTML = '';
+          countEl.textContent = '0 тест(ов)';
+          showToast(res.message || 'Ошибка загрузки');
+          return;
+        }
+        tests = (Array.isArray(res) ? res : []).map(normalizeTest);
+        render();
+      }
+
+      function render() {
+        countEl.textContent = `${tests.length} тест(ов)`;
+        list.innerHTML = tests.map((t) => cardTemplate(t)).join('');
+        bindCardActions();
+      }
+
+      function cardTemplate(t) {
+        const link = location.origin + '/test.html?=' + t.test_id;
+        return `
+        <article class="card" data-id="${t.test_id}">
+          <div class="meta">
+            <div class="name">${escapeHtml(t.name || 'Без названия')}</div>
+            <div class="muted">Вопросов: ${t.questions.length}</div>
+          </div>
+          <div class="actions">
+            <button class="icon-btn" data-action="edit">Редактировать</button>
+            <button class="icon-btn danger" data-action="delete">Удалить</button>
+            <div class="menu-wrap">
+              <button class="kebab" aria-haspopup="menu" aria-expanded="false"></button>
+              <div class="menu" role="menu">
+                <button role="menuitem" data-action="share" data-link="${link}">Скопировать ссылку</button>
+                <button role="menuitem" data-action="qr" data-link="${link}">Показать QR</button>
+              </div>
+            </div>
+          </div>
+        </article>`;
+      }
+
+      function bindCardActions() {
+        document.querySelectorAll('.card').forEach((card) => {
+          const id = card.getAttribute('data-id');
+          card.querySelector('[data-action="edit"]').onclick = () => {
+            showToast('Открываю редактор…');
+            location.assign('./edit.html?id=' + id);
+          };
+          card.querySelector('[data-action="delete"]').onclick = async () => {
+            if (!confirm('Удалить тест?')) return;
+            const res = await api.deleteTest(id, token);
+            if (res?.error) {
+              showToast(res.message || 'Не удалось удалить');
+              return;
+            }
+            await loadTests();
+            showToast('Тест удалён');
+          };
+          const wrap = card.querySelector('.menu-wrap');
+          const kebab = wrap.querySelector('.kebab');
+          const menu = wrap.querySelector('.menu');
+          kebab.onclick = (e) => {
+            e.stopPropagation();
+            document
+              .querySelectorAll('.menu')
+              .forEach((m) => m.classList.remove('open'));
+            menu.classList.toggle('open');
+          };
+          wrap.querySelectorAll('[role="menuitem"]').forEach((item) => {
+            const link = item.getAttribute('data-link');
+            const action = item.getAttribute('data-action');
+            item.onclick = () => {
+              if (action === 'share') copyLink(link);
+              if (action === 'qr') openModal(link);
+              menu.classList.remove('open');
+            };
+          });
+        });
+      }
+
+      document.body.addEventListener('click', () => {
+        document
+          .querySelectorAll('.menu')
+          .forEach((m) => m.classList.remove('open'));
+      });
+
+      btnNew.addEventListener('click', async () => {
+        btnNew.disabled = true;
+        const dto = { teacher_id: teacher.id, name: 'Новый тест' };
+        const created = await api.createTest(dto, token);
+        btnNew.disabled = false;
+        if (created?.error) {
+          showToast(created.message || 'Не удалось создать тест');
+          return;
+        }
+        await loadTests();
+        showToast('Черновик создан');
+      });
+
+      function copyLink(link) {
+        navigator.clipboard.writeText(link);
+        showToast('Ссылка скопирована');
+      }
+
+      const modal = document.getElementById('modal');
+      const modalClose = document.getElementById('modal-close');
+      const shareInput = document.getElementById('share-url');
+      const copyBtn = document.getElementById('copy-link');
+
+      function openModal(link) {
+        shareInput.value = link;
+        modal.classList.add('open');
+      }
+
+      modalClose.onclick = () => modal.classList.remove('open');
+      copyBtn.onclick = () => copyLink(shareInput.value);
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.remove('open');
+      });
+
+      function escapeHtml(str) {
+        return String(str ?? '').replace(
+          /[&<>"']/g,
+          (m) =>
+            ({
+              '&': '&amp;',
+              '<': '&lt;',
+              '>': '&gt;',
+              '"': '&quot;',
+              "'": '&#39;',
+            }[m])
+        );
+      }
+
+      await loadTests();
+    </script>
+  </body>
+</html>

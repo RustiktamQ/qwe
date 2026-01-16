@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FastTest — Редактирование теста</title>
+    <meta
+      name="description"
+      content="Страница редактирования теста FastTest — изменение названия и вопросов с выбором из четырёх вариантов."
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='6' y='6' width='52' height='52' rx='12' fill='%231a73e8'/%3E%3Cpath d='M18 33h28M18 24h20M18 42h24' stroke='%23fff' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E"
+    />
+    <style>
+      :root {
+        --bg: #ffffff;
+        --surface: #ffffff;
+        --ink: #0b1220;
+        --muted: #5f6b7a;
+        --blue: #1a73e8;
+        --green: #16a34a;
+        --line: #e6e8ee;
+        --shadow: 0 8px 30px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.05);
+        --radius-lg: 16px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      a {
+        text-decoration: none;
+      }
+      body {
+        margin: 0;
+        font: 16px/1.55 Inter, ui-sans-serif, system-ui, -apple-system,
+          'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+        color: var(--ink);
+        background: var(--bg);
+      }
+      .header {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: var(--surface);
+        border-bottom: 1px solid var(--line);
+      }
+      .header__inner {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 20px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 800;
+      }
+      .logo {
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--blue), #5aa1ff);
+        display: grid;
+        place-items: center;
+        color: #fff;
+        font-weight: 900;
+      }
+      .actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 40px;
+        padding: 0 14px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        background: #fff;
+        cursor: pointer;
+        font-weight: 700;
+      }
+      .btn:hover {
+        box-shadow: var(--shadow);
+      }
+      .btn.success {
+        background: var(--green);
+        border-color: transparent;
+        color: #fff;
+      }
+      .btn.danger {
+        background: #d93025;
+        border-color: transparent;
+        color: #fff;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .titlebar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin: 6px 0 14px;
+      }
+      .title {
+        font-size: 26px;
+        margin: 0;
+      }
+      .muted {
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .badge {
+        background: #f2f7ff;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 6px 10px;
+        font-size: 12px;
+        color: #1357b7;
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        padding: 16px;
+        margin-bottom: 14px;
+      }
+      .label {
+        display: block;
+        font-weight: 700;
+        font-size: 14px;
+        margin-bottom: 6px;
+      }
+      .input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+      }
+      .q {
+        display: grid;
+        gap: 10px;
+      }
+      .q-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+      .q-title {
+        font-weight: 800;
+      }
+      .q-actions {
+        display: flex;
+        gap: 8px;
+      }
+      .qnum {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        border: 1px solid var(--line);
+        background: #fff;
+        font-weight: 800;
+      }
+      .opt-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      @media (max-width: 900px) {
+        .opt-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .opt {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .radio {
+        width: 18px;
+        height: 18px;
+      }
+      .toolbar {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .toast {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #111827;
+        color: #fff;
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-size: 14px;
+        box-shadow: var(--shadow);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+        z-index: 80;
+      }
+      .toast.show {
+        opacity: 1;
+      }
+      .back {
+        color: black;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="header__inner">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">F</div>
+          <div>FastTest</div>
+        </div>
+        <div class="actions">
+          <a class="btn back" href="/teacherDashboard">← К списку</a>
+          <button class="btn success" id="btn-publish">Сохранить</button>
+          <button class="btn danger" id="btn-delete">Удалить тест</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container" role="main">
+      <div class="titlebar">
+        <h1 class="title">
+          Редактирование теста <span class="badge" id="tid">—</span>
+        </h1>
+        <div class="muted">Всего вопросов: <span id="qcount">0</span></div>
+      </div>
+
+      <section class="card">
+        <label class="label" for="test-title">Название теста</label>
+        <input
+          id="test-title"
+          class="input"
+          placeholder="Например: Контрольная по JavaScript"
+        />
+        <div class="muted" style="margin-top: 6px">
+          Измените название — оно отображается студентам.
+        </div>
+      </section>
+
+      <section id="questions"></section>
+
+      <section class="card toolbar">
+        <button class="btn" id="btn-add-bottom">+ Добавить вопрос</button>
+      </section>
+    </main>
+
+    <div class="toast" id="toast">Сохранено</div>
+
+    <script type="module">
+      import ApiController from '../scripts/apiController.js';
+
+      const $ = (s) => document.querySelector(s);
+      const $$ = (s) => Array.from(document.querySelectorAll(s));
+      const toast = $('#toast');
+      const showToast = (t) => {
+        toast.textContent = t;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 1400);
+      };
+      const uid = () => Math.random().toString(36).slice(2, 9);
+      const escapeHtml = (str) =>
+        String(str || '').replace(
+          /[&<>"']/g,
+          (m) =>
+            ({
+              '&': '&amp;',
+              '<': '&lt;',
+              '>': '&gt;',
+              '"': '&quot;',
+              "'": '&#39;',
+            }[m])
+        );
+      const decodeJwt = (token) => {
+        try {
+          return JSON.parse(atob(token.split('.')[1]));
+        } catch {
+          return {};
+        }
+      };
+      const getTestId = () => {
+        const u = new URL(location.href);
+        return Number(u.searchParams.get('id') || 0);
+      };
+
+      const api = new ApiController();
+      const token = localStorage.getItem('token');
+      if (!token) location.assign('../');
+      const auth = await api.isAuthed(token);
+      if (auth?.error) location.assign('../');
+
+      const teacher = decodeJwt(token);
+      const testId = getTestId();
+
+      const qWrap = $('#questions');
+      const qcount = $('#qcount');
+      const titleInput = $('#test-title');
+      $('#tid').textContent = String(testId);
+
+      let state = {
+        test_id: testId,
+        name: '',
+        _originalName: '',
+        teacher_id: teacher?.id,
+        questions: [],
+      };
+
+      async function loadTest() {
+        let test = null;
+        const byTeacher = await api.getTestsByTeacher(teacher.id);
+        if (Array.isArray(byTeacher))
+          test =
+            byTeacher.find((t) => Number(t.test_id) === Number(testId)) || null;
+        if (!test) {
+          const all = await api.getAllTests();
+          if (Array.isArray(all))
+            test =
+              all.find((t) => Number(t.test_id) === Number(testId)) || null;
+        }
+        if (!test) {
+          showToast('Тест не найден');
+          return;
+        }
+
+        state.name = String(test.name || '');
+        state._originalName = state.name;
+        titleInput.value = state.name;
+
+        const rawQuestions = Array.isArray(test.questions)
+          ? test.questions
+          : [];
+        const enriched = [];
+        for (const q of rawQuestions) {
+          const qid = q.question_id ?? q.id ?? q.qid;
+          let optRow = null;
+          try {
+            optRow = await api.getOptionsByQuestion(qid);
+          } catch {}
+          const mapped = {
+            correct: optRow?.correct ?? '',
+            incorrect1: optRow?.incorrect1 ?? '',
+            incorrect2: optRow?.incorrect2 ?? '',
+            incorrect3: optRow?.incorrect3 ?? '',
+            option_id: optRow?.option_id ?? optRow?.id ?? null,
+          };
+          enriched.push({
+            id: String(qid ?? uid()),
+            question_id: qid || null,
+            option_row_id: mapped.option_id,
+            text: String(q.text || ''),
+            _originalText: String(q.text || ''),
+            options: [
+              { key: 'A', text: mapped.correct },
+              { key: 'B', text: mapped.incorrect1 },
+              { key: 'C', text: mapped.incorrect2 },
+              { key: 'D', text: mapped.incorrect3 },
+            ],
+            correct: 'A',
+            _status: 'existing',
+          });
+        }
+        state.questions = enriched;
+        render();
+      }
+
+      function render() {
+        qWrap.innerHTML = state.questions.map(questionTemplate).join('');
+        qcount.textContent = String(state.questions.length);
+        bindQuestionEvents();
+      }
+
+      function questionTemplate(q, i) {
+        const name = `correct-${q.id}`;
+        return `
+          <article class="card q" data-id="${q.id}">
+            <div class="q-head">
+              <div class="q-title"><span class="qnum">${
+                i + 1
+              }</span> Вопрос</div>
+              <div class="q-actions">
+                <button class="btn" data-act="dup">Дублировать</button>
+                <button class="btn" data-act="del">Удалить</button>
+              </div>
+            </div>
+            <div>
+              <label class="label" for="qt-${q.id}">Формулировка</label>
+              <input id="qt-${q.id}" class="input" value="${escapeHtml(
+          q.text
+        )}" placeholder="Например: Что такое замыкание?" />
+            </div>
+            <div>
+              <label class="label">Варианты (выберите правильный)</label>
+              <div class="opt-grid">
+                ${q.options
+                  .map((o, idx) =>
+                    optionTemplate(name, o, q.correct === o.key, q.id, idx)
+                  )
+                  .join('')}
+              </div>
+            </div>
+          </article>
+        `;
+      }
+
+      function optionTemplate(groupName, opt, checked, qid, idx) {
+        return `
+          <label class="opt">
+            <input class="radio" type="radio" name="${groupName}" value="${
+          opt.key
+        }" ${checked ? 'checked' : ''} />
+            <input class="input" data-role="opt" data-q="${qid}" data-index="${idx}" value="${escapeHtml(
+          opt.text
+        )}" placeholder="Вариант ${opt.key}" />
+          </label>
+        `;
+      }
+
+      function bindQuestionEvents() {
+        $$('.q').forEach((card) => {
+          const id = card.getAttribute('data-id');
+          card.querySelector(`#qt-${id}`).oninput = (e) => {
+            const q = state.questions.find((x) => x.id === id);
+            q.text = e.target.value;
+          };
+          card.querySelectorAll('[data-role="opt"]').forEach((inp) => {
+            inp.oninput = (e) => {
+              const qid = inp.getAttribute('data-q');
+              const idx = Number(inp.getAttribute('data-index'));
+              const q = state.questions.find((x) => x.id === qid);
+              q.options[idx].text = e.target.value;
+            };
+          });
+          card.querySelectorAll(`input[type=radio]`).forEach((r) => {
+            r.onchange = () => {
+              const q = state.questions.find((x) => x.id === id);
+              q.correct = r.value;
+            };
+          });
+          card.querySelector('[data-act="del"]').onclick = () =>
+            removeQuestion(id, true);
+          card.querySelector('[data-act="dup"]').onclick = () =>
+            duplicateQuestion(id);
+        });
+      }
+
+      function addQuestion() {
+        const id = uid();
+        state.questions.push({
+          id,
+          question_id: null,
+          option_row_id: null,
+          text: '',
+          _originalText: '',
+          options: [
+            { key: 'A', text: '' },
+            { key: 'B', text: '' },
+            { key: 'C', text: '' },
+            { key: 'D', text: '' },
+          ],
+          correct: 'A',
+          _status: 'new',
+        });
+        render();
+        setTimeout(() => document.getElementById(`qt-${id}`)?.focus(), 0);
+      }
+
+      async function removeQuestion(id, immediateDelete = false) {
+        const i = state.questions.findIndex((x) => x.id === id);
+        if (i === -1) return;
+        const q = state.questions[i];
+        if (immediateDelete && q.question_id) {
+          const res = await api.deleteQuestion(q.question_id, token);
+          if (res?.error) {
+            showToast(res.message || 'Не удалось удалить вопрос');
+            return;
+          }
+        }
+        state.questions.splice(i, 1);
+        render();
+        showToast('Вопрос удалён');
+      }
+
+      function duplicateQuestion(id) {
+        const q = state.questions.find((x) => x.id === id);
+        if (!q) return;
+        const clone = JSON.parse(JSON.stringify(q));
+        clone.id = uid();
+        clone.question_id = null;
+        clone.option_row_id = null;
+        clone._originalText = '';
+        clone._status = 'new';
+        state.questions.push(clone);
+        render();
+      }
+
+      function validate() {
+        const title = titleInput.value.trim();
+        if (!title) return { ok: false, msg: 'Введите название теста' };
+        if (state.questions.length === 0)
+          return { ok: false, msg: 'Добавьте минимум один вопрос' };
+        for (const [i, q] of state.questions.entries()) {
+          if (!q.text.trim())
+            return { ok: false, msg: `Вопрос ${i + 1}: введите текст` };
+          for (const o of q.options)
+            if (!o.text.trim())
+              return {
+                ok: false,
+                msg: `Вопрос ${i + 1}: заполните вариант ${o.key}`,
+              };
+          if (!['A', 'B', 'C', 'D'].includes(q.correct))
+            return {
+              ok: false,
+              msg: `Вопрос ${i + 1}: выберите правильный вариант`,
+            };
+        }
+        return { ok: true };
+      }
+
+      function toOptionDto(q) {
+        const lookup = Object.fromEntries(
+          q.options.map((o) => [o.key, o.text])
+        );
+        const correct = lookup[q.correct];
+        const incorrect = ['A', 'B', 'C', 'D']
+          .filter((k) => k !== q.correct)
+          .map((k) => lookup[k]);
+        return {
+          question_id: q.question_id,
+          correct,
+          incorrect1: incorrect[0],
+          incorrect2: incorrect[1],
+          incorrect3: incorrect[2],
+        };
+      }
+
+      async function saveAll() {
+        const v = validate();
+        if (!v.ok) {
+          showToast(v.msg);
+          return;
+        }
+
+        const newName = titleInput.value.trim();
+        if (newName !== state._originalName) {
+          const r = await api.updateTest(
+            state.test_id,
+            { name: newName },
+            token
+          );
+          if (r?.error) {
+            showToast(r.message || 'Не удалось сохранить название');
+            return;
+          }
+          state.name = newName;
+          state._originalName = newName;
+        }
+
+        for (const q of state.questions) {
+          if (q.question_id && q.text !== q._originalText) {
+            const del = await api.deleteQuestion(q.question_id, token);
+            if (del?.error) {
+              showToast(del.message || 'Не удалось обновить вопрос');
+              return;
+            }
+            q.question_id = null;
+            q.option_row_id = null;
+            q._status = 'new';
+          }
+          if (!q.question_id) {
+            const createdQ = await api.createQuestion(
+              { test_id: state.test_id, text: q.text },
+              token
+            );
+            if (createdQ?.error || !createdQ?.question_id) {
+              showToast(createdQ?.message || 'Не удалось создать вопрос');
+              return;
+            }
+            q.question_id = createdQ.question_id;
+            const dto = toOptionDto(q);
+            dto.question_id = q.question_id;
+            const createdOpt = await api.createOption(dto, token);
+            if (createdOpt?.error) {
+              showToast(createdOpt.message || 'Не удалось сохранить варианты');
+              return;
+            }
+            q.option_row_id = createdOpt.option_id ?? createdOpt.id ?? null;
+            q._originalText = q.text;
+            q._status = 'existing';
+          } else {
+            const dto = toOptionDto(q);
+            if (q.option_row_id) {
+              const upd = await api.editOption(q.option_row_id, dto, token);
+              if (upd?.error) {
+                showToast(upd.message || 'Не удалось обновить варианты');
+                return;
+              }
+            } else {
+              const createdOpt = await api.createOption(dto, token);
+              if (createdOpt?.error) {
+                showToast(
+                  createdOpt.message || 'Не удалось сохранить варианты'
+                );
+                return;
+              }
+              q.option_row_id = createdOpt.option_id ?? createdOpt.id ?? null;
+            }
+          }
+        }
+        showToast('Изменения сохранены');
+      }
+
+      $('#btn-add-bottom').onclick = addQuestion;
+      $('#btn-publish').onclick = saveAll;
+      $('#btn-delete').onclick = async () => {
+        if (!confirm('Удалить этот тест безвозвратно?')) return;
+        const res = await api.deleteTest(state.test_id, token);
+        if (res?.error) {
+          showToast(res.message || 'Не удалось удалить тест');
+          return;
+        }
+        showToast('Тест удалён');
+        setTimeout(() => location.assign('/teacherDashboard'), 800);
+      };
+      titleInput.addEventListener('input', (e) => {
+        state.name = e.target.value;
+      });
+
+      await loadTest();
+    </script>
+  </body>
+</html>

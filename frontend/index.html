@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="styles/style.css" />
+    <title>FastTest — создавай и делись тестами за секунды</title>
+    <meta
+      name="description"
+      content="FastTest — мгновенное создание и публикация тестов. Простая редактура, мгновенный шэринг, авторизация преподавателей."
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='6' y='6' width='52' height='52' rx='12' fill='%231a73e8'/%3E%3Cpath d='M18 33h28M18 24h20M18 42h24' stroke='%23fff' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E"
+    />
+  </head>
+  <body>
+    <header class="header">
+      <div class="header__inner">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">F</div>
+          <div>FastTest</div>
+        </div>
+        <nav class="nav" aria-label="Главная навигация">
+          <a class="btn" id="api-link-header" href="#">API</a>
+        </nav>
+      </div>
+    </header>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <section class="hero">
+      <div class="hero__inner">
+        <div>
+          <h1 class="title">
+            Создай тест и поделись ссылкой за
+            <span style="color: var(--blue)">30 секунд</span>
+          </h1>
+          <p class="subtitle">
+            FastTest — минималистичный инструмент для преподавателей. Мгновенное
+            создание, редактирование и публикация тестов.
+          </p>
+          <div class="hero__cta">
+            <a class="btn primary" href="#auth">Начать</a>
+            <a class="btn" id="api-link-hero" href="#">API</a>
+          </div>
+        </div>
+
+        <aside class="card" id="auth" aria-labelledby="auth-title">
+          <h2 id="auth-title" style="margin: 0 0 8px; font-size: 20px">
+            Кабинет преподавателя
+          </h2>
+          <div class="tabs" role="tablist">
+            <button
+              class="tab is-active"
+              role="tab"
+              aria-selected="true"
+              aria-controls="pane-login"
+              id="tab-login"
+            >
+              Вход
+            </button>
+            <button
+              class="tab"
+              role="tab"
+              aria-selected="false"
+              aria-controls="pane-register"
+              id="tab-register"
+            >
+              Регистрация
+            </button>
+          </div>
+
+          <form id="pane-login" role="tabpanel" aria-labelledby="tab-login">
+            <div class="field">
+              <label class="label" for="login-email">E-mail</label>
+              <input
+                id="login-email"
+                class="input"
+                type="email"
+                autocomplete="username"
+                placeholder="teacher@example.com"
+                required
+              />
+            </div>
+            <div class="field">
+              <label class="label" for="login-password">Пароль</label>
+              <input
+                id="login-password"
+                class="input"
+                type="password"
+                autocomplete="current-password"
+                placeholder="••••••••"
+                required
+              />
+            </div>
+            <div class="err" id="login-err"></div>
+            <button class="btn primary full" id="btn-login" type="submit">
+              Войти
+            </button>
+            <div class="hint">
+              Нет аккаунта? Переключитесь на вкладку «Регистрация».
+            </div>
+          </form>
+
+          <form
+            id="pane-register"
+            role="tabpanel"
+            aria-labelledby="tab-register"
+            hidden
+          >
+            <div class="field">
+              <label class="label" for="reg-name">Имя</label>
+              <input
+                id="reg-name"
+                class="input"
+                type="text"
+                placeholder="Иван Петров"
+                required
+              />
+            </div>
+            <div class="field">
+              <label class="label" for="reg-email">E-mail</label>
+              <input
+                id="reg-email"
+                class="input"
+                type="email"
+                autocomplete="email"
+                placeholder="teacher@example.com"
+                required
+              />
+            </div>
+            <div class="field">
+              <label class="label" for="reg-password">Пароль</label>
+              <input
+                id="reg-password"
+                class="input"
+                type="password"
+                autocomplete="new-password"
+                placeholder="Str0ngPass!123"
+                required
+              />
+            </div>
+            <div class="err" id="reg-err"></div>
+            <button class="btn primary full" id="btn-register" type="submit">
+              Зарегистрироваться
+            </button>
+            <div class="hint">
+              После успешной регистрации вы автоматически войдёте в систему.
+            </div>
+          </form>
+        </aside>
+      </div>
+    </section>
+
+    <footer style="border-top: 1px solid var(--line); background: #fff">
+      <div
+        style="
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 18px 20px;
+          color: var(--muted);
+          font-size: 14px;
+          display: flex;
+          justify-content: space-between;
+          gap: 10px;
+          flex-wrap: wrap;
+        "
+      ></div>
+    </footer>
+
+    <script type="module">
+      import ApiController from './scripts/apiController.js';
+      import showToast from './scripts/showToast.js';
+      import config from './config.js';
+
+      const apiLinkHeader = document.getElementById('api-link-header');
+      const apiLinkHero = document.getElementById('api-link-hero');
+      const apiDocsUrl = `${config.FULL_HOST}/api/docs`;
+      apiLinkHeader.href = apiDocsUrl;
+      apiLinkHero.href = apiDocsUrl;
+
+      const tabLogin = document.getElementById('tab-login');
+      const tabRegister = document.getElementById('tab-register');
+      const paneLogin = document.getElementById('pane-login');
+      const paneRegister = document.getElementById('pane-register');
+      function activate(tab) {
+        const isLogin = tab === 'login';
+        tabLogin.classList.toggle('is-active', isLogin);
+        tabRegister.classList.toggle('is-active', !isLogin);
+        tabLogin.setAttribute('aria-selected', String(isLogin));
+        tabRegister.setAttribute('aria-selected', String(!isLogin));
+        paneLogin.hidden = !isLogin;
+        paneRegister.hidden = isLogin;
+      }
+      tabLogin.addEventListener('click', () => activate('login'));
+      tabRegister.addEventListener('click', () => activate('register'));
+
+      const api = new ApiController();
+      const loginForm = paneLogin;
+      const regForm = paneRegister;
+
+      const token = localStorage.getItem('token');
+      const isAuth = await api.isAuthed(token);
+      if (isAuth === true || isAuth?.ok === true)
+        location.assign('./teacherDashboard');
+
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value;
+        const res = await api.login(email, password);
+        if (res?.error) {
+          const msg =
+            typeof res.message === 'string'
+              ? res.message
+              : JSON.stringify(res.message);
+          showToast(msg, 'error');
+          return;
+        }
+        if (res?.token) {
+          localStorage.setItem('token', res.token);
+          showToast('Успешный вход', 'success');
+          location.assign('/teacherDashboard');
+        } else {
+          showToast('Токен не получен', 'error');
+        }
+      });
+
+      regForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('reg-name').value.trim();
+        const email = document.getElementById('reg-email').value.trim();
+        const password = document.getElementById('reg-password').value;
+        const r = await api.register(name, email, password);
+        if (r?.error) {
+          const msg =
+            typeof r.message === 'string'
+              ? r.message
+              : JSON.stringify(r.message);
+          showToast(msg, 'error');
+          return;
+        }
+        const res = await api.login(email, password);
+        if (res?.error) {
+          const msg =
+            typeof res.message === 'string'
+              ? res.message
+              : JSON.stringify(res.message);
+          showToast(msg, 'error');
+          return;
+        }
+        if (res?.token) {
+          localStorage.setItem('token', res.token);
+          showToast('Регистрация выполнена', 'success');
+          location.assign('/teacherDashboard');
+        } else {
+          showToast('Токен не получен', 'error');
+        }
+      });
+    </script>
+  </body>
+</html>

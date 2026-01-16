@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "fastTestJs",
+    "slug": "fastTestJs",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": false,
+
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+
+    "android": {
+      "package": "com.yourname.fasttestjs",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "jsEngine": "jsc",
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false
+    },
+
+    "ios": {
+      "supportsTablet": true
+    },
+
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
